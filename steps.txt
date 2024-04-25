@@ -16,6 +16,7 @@ Instalar pacotes no projeto:
 dotnet add package Microsoft.EntityFrameworkCore --version 8.0.4
 dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.0.4
 dotnet add package Microsoft.EntityFrameworkCore.Tools --version 8.0.4
+dotnet add package Pomelo.EntityFrameworkCore.MySql --version
 
 
 2- Usar extensões do CODE como Nuget Gallery
