@@ -48,4 +48,6 @@ public class Movie
     public String HourDuration { get {
         return TimeSpan.FromMinutes(Duration).ToString(@"%h'h 'm'min'");
     }}
+
+    public ICollection<MovieGenre> Genres { get; set; }
 }
