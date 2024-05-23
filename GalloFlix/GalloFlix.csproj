@@ -7,7 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    //gestao de usuario
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
+    //manipulação 
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+    //trabalha junto
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -16,6 +20,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    //conecta ao MySql
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
   </ItemGroup>
 
