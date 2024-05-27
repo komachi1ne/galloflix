@@ -1,37 +1,140 @@
 using GalloFlix.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace GalloFlix.Data;
 
-    public class AppDbContext : DbContext
+public class AppDbContext : DbContext
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
-        {
-        }
+    }
 
-        public DbSet<Genre> Genres { get; set; }
-        public DbSet<Movie> Movies { get; set; }
-        public DbSet<MovieGenre> MovieGenres { get; set; }
+    public DbSet<AppUser> AppUsers { get; set; }
+    public DbSet<Genre> Genres { get; set; }
+    public DbSet<Movie> Movies { get; set; }
+    public DbSet<MovieGenre> MovieGenres { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
 
-        //cria a primary key
         #region Configuração do Muitos para Muitos do MovieGenre
-        builder.Entity<MovieGenre> ()
-            .HasKey(mg => new {mg.MovieId, mg.GenreId});
-
-        //cria chaves estrangeiras
         builder.Entity<MovieGenre>()
-            .HasOne(mg => mg.Movie) 
+            .HasKey(mg => new { mg.MovieId, mg.GenreId });
+
+        builder.Entity<MovieGenre>()
+            .HasOne(mg => mg.Movie)
             .WithMany(m => m.Genres)
             .HasForeignKey(mg => mg.MovieId);
 
         builder.Entity<MovieGenre>()
-            .HasOne(mg => mg.Genre) 
+            .HasOne(mg => mg.Genre)
             .WithMany(g => g.Movies)
             .HasForeignKey(mg => mg.GenreId);
         #endregion
+    
+        #region Popular os dados de Usuário
+        // Perfil - IdentityRole
+        List<IdentityRole> roles = new()
+        {
+            new IdentityRole()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Administrador",
+                NormalizedName = "ADMINISTRADOR"
+            },
+            new IdentityRole()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Moderador",
+                NormalizedName = "MODERADOR"
+            },
+            new IdentityRole()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Usuário",
+                NormalizedName = "USUÁRIO"
+            }
+        };
+        builder.Entity<IdentityRole>().HasData(roles);
+
+        // Conta do Usuário - IdentityUser
+        List<IdentityUser> users = new()
+        {
+            new IdentityUser()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = "admin@galloflix.com",
+                NormalizedEmail = "ADMIN@GALLOFLIX.COM",
+                UserName = "Admin",
+                NormalizedUserName = "ADMIN",
+                EmailConfirmed = true,
+                LockoutEnabled = false
+            },
+            new IdentityUser()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = "user@gmail.com",
+                NormalizedEmail = "USER@GMAIL.COM",
+                UserName = "User",
+                NormalizedUserName = "USER",
+                EmailConfirmed = true,
+                LockoutEnabled = true
+            }
+        };
+        foreach (var user in users)
+        {
+            PasswordHasher<IdentityUser> pass = new();
+            pass.HashPassword(user, "@Etec123");
+        }
+        builder.Entity<IdentityUser>().HasData(users);
+
+        // Dados pessoais do Usuário - AppUser
+        List<AppUser> appUsers = new()
+        {
+            new AppUser()
+            {
+                AppUserId = users[0].Id,
+                Name = "Ana Beatriz da Silva",
+                Birthday = DateTime.Parse("29/04/2008"),
+                Photo = "/img/users/avatar.png"
+            },
+            new AppUser()
+            {
+                AppUserId = users[1].Id,
+                Name = "Adilson",
+                Birthday = DateTime.Parse("27/06/1999")
+            }
+        };
+        builder.Entity<AppUser>().HasData(appUsers);
+
+        // Perfis dos Usuários - IdentityUserRole
+        List<IdentityUserRole<string>> userRoles = new()
+        {
+            new IdentityUserRole<string>()
+            {
+                UserId = users[0].Id,
+                RoleId = roles[0].Id
+            },
+            new IdentityUserRole<string>()
+            {
+                UserId = users[0].Id,
+                RoleId = roles[1].Id
+            },
+            new IdentityUserRole<string>()
+            {
+                UserId = users[0].Id,
+                RoleId = roles[2].Id
+            },
+            new IdentityUserRole<string>()
+            {
+                UserId = users[1].Id,
+                RoleId = roles[2].Id
+            }
+        };
+        builder.Entity<IdentityUserRole<string>>().HasData(userRoles);
+        #endregion
     }
 }
+    
